@@ -63,6 +63,7 @@ public partial class EntityConvert
         RecordEntity record => new RecordIncomingSegment(record.FileUuid, record.FileUrl, (int)record.RecordLength),
         VideoEntity video => new VideoIncomingSegment(video.FileUuid, video.FileUrl),
         MultiMsgEntity multiMsg => new ForwardIncomingSegment(multiMsg.ResId!),
+        LightAppEntity lightApp => new LightAppIncomingSegment(lightApp.AppName, lightApp.Payload),
         // ? => new MarketFaceSegment(...),
         // ? => new LightAppSegment(...),
         // ? => new XmlSegment(...),

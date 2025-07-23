@@ -1,9 +1,12 @@
 using System.Text;
+using System.Text.Json;
+using System.Web;
 using Lagrange.Core.Common;
 using Lagrange.Core.Events.EventArgs;
 using Lagrange.Core.Internal.Events;
 using Lagrange.Core.Internal.Events.Message;
 using Lagrange.Core.Internal.Packets.Notify;
+using Lagrange.Core.Message.Entities;
 using Lagrange.Core.Utility.Binary;
 using ProtoHelper = Lagrange.Core.Utility.ProtoHelper;
 
@@ -22,6 +25,22 @@ internal class PushLogic(BotContext context) : ILogic
             case Type.PrivateMessage:
             case Type.TempMessage:
                 var message = await context.EventContext.GetLogic<MessagingLogic>().Parse(messageEvent.MsgPush.CommonMessage);
+                if (message.Entities[0] is LightAppEntity {AppName: "com.tencent.qun.invite"} app)
+                {
+                    using var document = JsonDocument.Parse(app.Payload);
+                    var root = document.RootElement;
+
+                    string url = root.GetProperty("meta").GetProperty("news").GetProperty("jumpUrl").GetString() ?? throw new Exception("sb tx! Is this 'com.tencent.qun.invite'?");
+                    var query = HttpUtility.ParseQueryString(new Uri(url).Query);
+                    long groupUin = uint.Parse(query["groupcode"] ?? throw new Exception("sb tx! Is this '/group/invite_join'?"));
+                    ulong sequence = ulong.Parse(query["msgseq"] ?? throw new Exception("sb tx! Is this '/group/invite_join'?"));
+                    context.EventInvoker.PostEvent(new BotGroupInviteEvent(
+                        sequence.ToString(),
+                        message.Contact.Uin,
+                        groupUin
+                    ));
+                    break;
+                }
                 context.EventInvoker.PostEvent(new BotMessageEvent(message, messageEvent.Raw));
                 break;
             case Type.GroupMemberDecreaseNotice when messageEvent.MsgPush.CommonMessage.MessageBody.MsgContent is { } content:
@@ -48,14 +67,15 @@ internal class PushLogic(BotContext context) : ILogic
                     );
                 }
                 break;
-            case Type.GroupInviteNotice when messageEvent.MsgPush.CommonMessage.MessageBody.MsgContent is { } content:
-                var invite = ProtoHelper.Deserialize<GroupInvite>(content.Span);
-                context.EventInvoker.PostEvent(new BotGroupInviteEvent(
-                    invite.InviterUid,
-                    context.CacheContext.ResolveCachedUin(invite.InviterUid) ?? 0,
-                    invite.GroupUin
-                ));
-                break;
+            // Note: There's no seq in this event, don't use.
+            // case Type.GroupInviteNotice when messageEvent.MsgPush.CommonMessage.MessageBody.MsgContent is { } content:
+            //     var invite = ProtoHelper.Deserialize<GroupInvite>(content.Span);
+            //     context.EventInvoker.PostEvent(new BotGroupInviteEvent(
+            //         messageEvent.MsgPush.CommonMessage.ContentHead.Sequence.ToString(),
+            //         context.CacheContext.ResolveCachedUin(invite.InviterUid) ?? 0,
+            //         invite.GroupUin
+            //     ));
+            //     break;
             case Type.Event0x210:
                 var pkgType210 = (Event0x210SubType)messageEvent.MsgPush.CommonMessage.ContentHead.SubType;
                 switch (pkgType210)

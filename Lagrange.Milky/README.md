@@ -68,8 +68,12 @@ https://lagrangedev.github.io/Lagrange.Milky.Document
 - [ ] /get_friend_requests
 - [ ] /get_group_requests
 - [ ] /get_group_invitations
-- [ ] /accept_request
-- [ ] /reject_request
+- [ ] /accept_friend_request
+- [ ] /accept_group_invite_request
+- [ ] /accept_group_join_request
+- [ ] /reject_friend_request
+- [ ] /reject_group_invite_request
+- [ ] /reject_group_join_request
 
 #### file
 

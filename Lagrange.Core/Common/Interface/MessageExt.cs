@@ -58,4 +58,7 @@ public static class MessageExt
     
     public static Task GroupQuit(this BotContext context, long groupUin)
         => context.EventContext.GetLogic<OperationLogic>().GroupQuit(groupUin);
+    
+    public static Task SetGroupInviteAccept(this BotContext context, long groupUin, long sequence)
+        => context.EventContext.GetLogic<OperationLogic>().SetGroupInviteAccept(groupUin, sequence);
 }
