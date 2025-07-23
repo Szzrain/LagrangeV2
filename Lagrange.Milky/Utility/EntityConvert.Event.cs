@@ -29,4 +29,18 @@ public partial class EntityConvert
         _bot.BotUin,
         new GroupMemberDecreaseEventData(@event.GroupUin, @event.UserUin, @event.OperatorUin == 0 ? null : @event.OperatorUin)
     );
+    
+    public FriendRequestEvent FriendRequestEvent(LgrEventArgs.BotFriendRequestEvent @event) => new(
+        @event.EventTime.ToUnixTimeSeconds(),
+        _bot.BotUin,
+        new FriendRequestEventData(@event.RequestId, DateTimeOffset.Now.ToUnixTimeSeconds(), false, 
+            @event.InitiatorUin == 0 ? null : @event.InitiatorUin,"pending",@event.Message, @event.Source)
+    );
+    
+    public GroupInvitationEvent GroupInvitationEvent(LgrEventArgs.BotGroupInviteEvent @event) => new(
+        @event.EventTime.ToUnixTimeSeconds(),
+        _bot.BotUin,
+        new GroupInvitationEventData(@event.RequestId, DateTimeOffset.Now.ToUnixTimeSeconds(), false, 
+            @event.InitiatorUin == 0 ? null : @event.InitiatorUin,"pending",@event.GroupUin)
+    );
 }

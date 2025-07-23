@@ -50,7 +50,7 @@ https://lagrangedev.github.io/Lagrange.Milky.Document
 
 - [ ] /set_group_name
 - [ ] /set_group_avatar
-- [ ] /set_group_member_card
+- [x] /set_group_member_card
 - [ ] /set_group_member_special_title
 - [ ] /set_group_member_admin
 - [ ] /set_group_member_mute
@@ -90,20 +90,20 @@ https://lagrangedev.github.io/Lagrange.Milky.Document
 - [x] bot_offline
 - [x] message_receive
 - [ ] message_recall
-- [ ] friend_request
+- [x] friend_request
 - [ ] group_request
-- [ ] group_invitation
+- [x] group_invitation
 - [ ] friend_nudge
 - [ ] friend_file_upload
 - [ ] group_admin_change
 - [ ] group_essence_message_change
 - [ ] group_member_increase
-- [ ] group_member_decrease
+- [x] group_member_decrease
 - [ ] group_name_change
 - [ ] group_message_reaction
 - [ ] group_mute
 - [ ] group_whole_mute
-- [ ] group_nudge
+- [x] group_nudge
 - [ ] group_file_upload
 
 ### segment

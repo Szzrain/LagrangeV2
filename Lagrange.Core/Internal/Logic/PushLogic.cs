@@ -48,6 +48,29 @@ internal class PushLogic(BotContext context) : ILogic
                     );
                 }
                 break;
+            case Type.GroupInviteNotice when messageEvent.MsgPush.CommonMessage.MessageBody.MsgContent is { } content:
+                var invite = ProtoHelper.Deserialize<GroupInvite>(content.Span);
+                context.EventInvoker.PostEvent(new BotGroupInviteEvent(
+                    invite.InviterUid,
+                    context.CacheContext.ResolveCachedUin(invite.InviterUid) ?? 0,
+                    invite.GroupUin
+                ));
+                break;
+            case Type.Event0x210:
+                var pkgType210 = (Event0x210SubType)messageEvent.MsgPush.CommonMessage.ContentHead.SubType;
+                switch (pkgType210)
+                {
+                    case Event0x210SubType.FriendRequestNotice when messageEvent.MsgPush.CommonMessage.MessageBody.MsgContent is { } content:
+                        var friendRequest = ProtoHelper.Deserialize<FriendRequest>(content.Span);
+                        context.EventInvoker.PostEvent(new BotFriendRequestEvent(
+                                friendRequest.Info!.SourceUid,
+                                messageEvent.MsgPush.CommonMessage.RoutingHead.FromUin,
+                                friendRequest.Info.Message,
+                                friendRequest.Info.Source?? string.Empty
+                            ));
+                        break;
+                }
+                break;
             case Type.Event0x2DC:
                 var pkgType = (Event0x2DCSubType)messageEvent.MsgPush.CommonMessage.ContentHead.SubType;
                 switch (pkgType)
@@ -88,6 +111,8 @@ internal class PushLogic(BotContext context) : ILogic
         Event0x2DC = 732,  // group related event
         
         GroupMemberDecreaseNotice = 34,
+        GroupRequestJoinNotice = 84, // directly entered
+        GroupInviteNotice = 87,  // the bot self is being invited
     }
     
     private enum Event0x2DCSubType
@@ -105,5 +130,17 @@ internal class PushLogic(BotContext context) : ILogic
         GroupNameChangeNotice = 12,
         GroupTodoNotice = 23,
         GroupReactionNotice = 35,
+    }
+    
+    private enum Event0x210SubType
+    {
+        FriendRequestNotice = 35,
+        GroupMemberEnterNotice = 38,
+        FriendDeleteOrPinChangedNotice = 39,
+        FriendRecallNotice = 138,
+        ServicePinChanged = 199, // e.g: My computer | QQ Wallet | ...
+        FriendPokeNotice = 290,
+        GroupKickNotice = 212,
+        FriendRecallPoke = 321,
     }
 }
