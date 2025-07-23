@@ -61,4 +61,7 @@ public static class MessageExt
     
     public static Task SetGroupInviteAccept(this BotContext context, long groupUin, long sequence)
         => context.EventContext.GetLogic<OperationLogic>().SetGroupInviteAccept(groupUin, sequence);
+    
+    public static Task SetFriendRequestAccept(this BotContext context, string targetUid)
+        => context.EventContext.GetLogic<OperationLogic>().SetFriendRequestAccept(targetUid);
 }

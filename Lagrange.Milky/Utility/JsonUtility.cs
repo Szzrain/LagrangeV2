@@ -87,6 +87,8 @@ public static partial class JsonUtility
     // == request ==
     // accept_group_invite_request 
     [JsonSerializable(typeof(AcceptGroupInviteRequestParameter))]
+    // accept_friend_request
+    [JsonSerializable(typeof(AcceptFriendRequestHandlerParameter))]
     // == file ==
     // upload_group_file
     [JsonSerializable(typeof(UploadGroupFileParameter))]
