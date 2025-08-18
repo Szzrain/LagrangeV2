@@ -6,6 +6,7 @@ using Lagrange.Milky.Api.Handler.File;
 using Lagrange.Milky.Api.Handler.Friend;
 using Lagrange.Milky.Api.Handler.Group;
 using Lagrange.Milky.Api.Handler.Message;
+using Lagrange.Milky.Api.Handler.Request;
 using Lagrange.Milky.Api.Handler.System;
 using Lagrange.Milky.Api.Result;
 using Lagrange.Milky.Entity.Event;
@@ -83,6 +84,8 @@ public static partial class JsonUtility
     [JsonSerializable(typeof(SetGroupMemberSpecialTitleParameter))]
     // quit_group
     [JsonSerializable(typeof(QuitGroupParameter))]
+    // accept_group_invitation
+    [JsonSerializable(typeof(AcceptGroupInvitationRequestParameter))]
     // == file ==
     // upload_group_file
     [JsonSerializable(typeof(UploadGroupFileParameter))]
