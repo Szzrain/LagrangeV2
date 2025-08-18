@@ -56,7 +56,7 @@ internal class OperationLogic(BotContext context) : ILogic
 
     public async Task SetGroupInviteSelfAccept(long groupUin, long sequence)
     {
-        await context.EventContext.SendEvent<SetGroupInviteSelfAcceptEventResp>(new SetGroupInviteSelfAcceptEventReq(groupUin, sequence));
+        await context.EventContext.SendEvent<SetGroupNotificationEventReq>(new SetGroupNotificationEventReq(groupUin, (ulong)sequence, BotGroupNotificationType.GroupInvite, GroupNotificationOperate.Allow, String.Empty));
     }
     
     public async Task GroupQuit(long groupUin)
