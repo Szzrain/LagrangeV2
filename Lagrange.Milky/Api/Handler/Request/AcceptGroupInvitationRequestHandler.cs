@@ -4,7 +4,7 @@ using Lagrange.Core.Common.Interface;
 
 namespace Lagrange.Milky.Api.Handler.Request;
 
-[Api("accept_group_invitation ")]
+[Api("accept_group_invitation")]
 public class AcceptGroupInvitationRequestHandler(BotContext bot) : IEmptyResultApiHandler<AcceptGroupInvitationRequestParameter>
 {
     private readonly BotContext _bot = bot;
