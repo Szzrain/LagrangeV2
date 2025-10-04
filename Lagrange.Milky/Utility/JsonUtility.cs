@@ -6,7 +6,6 @@ using Lagrange.Milky.Api.Handler.File;
 using Lagrange.Milky.Api.Handler.Friend;
 using Lagrange.Milky.Api.Handler.Group;
 using Lagrange.Milky.Api.Handler.Message;
-using Lagrange.Milky.Api.Handler.Request;
 using Lagrange.Milky.Api.Handler.System;
 using Lagrange.Milky.Api.Result;
 using Lagrange.Milky.Entity.Event;

@@ -1,8 +1,9 @@
 using System.Text.Json.Serialization;
 using Lagrange.Core;
+using Lagrange.Core.Common.Entity;
 using Lagrange.Core.Common.Interface;
 
-namespace Lagrange.Milky.Api.Handler.Request;
+namespace Lagrange.Milky.Api.Handler.Group;
 
 [Api("accept_group_invitation")]
 public class AcceptGroupInvitationRequestHandler(BotContext bot) : IEmptyResultApiHandler<AcceptGroupInvitationRequestParameter>
@@ -11,7 +12,7 @@ public class AcceptGroupInvitationRequestHandler(BotContext bot) : IEmptyResultA
 
     public async Task HandleAsync(AcceptGroupInvitationRequestParameter parameter, CancellationToken token)
     {
-        await _bot.SetGroupInviteSelfAccept(parameter.GroupId, parameter.InvitationSeq);
+        await _bot.SetGroupNotification(parameter.GroupId, (ulong)parameter.InvitationSeq, BotGroupNotificationType.InviteSelf, false, GroupNotificationOperate.Allow, String.Empty);
     }
 }
 
