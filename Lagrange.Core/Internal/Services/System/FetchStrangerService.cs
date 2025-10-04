@@ -91,6 +91,12 @@ internal class FetchStrangerService : BaseService<FetchStrangerEventReqBase, Fet
             property => property.Value
         );
 
+        // Check exists
+        if (!bytes.TryGetValue(20002, out byte[]? nicknameBytes))
+        {
+            throw new OperationException(-1, "Stranger not found");
+        }
+
         // Birthday
         byte[] birthday = bytes[20031];
         int year = BinaryPrimitives.ReadUInt16BigEndian(birthday.AsSpan(0, 2));
@@ -99,7 +105,7 @@ internal class FetchStrangerService : BaseService<FetchStrangerEventReqBase, Fet
 
         return ValueTask.FromResult(new FetchStrangerEventResp(new BotStranger(
             response.Body.Uin,
-            Encoding.UTF8.GetString(bytes[20002]),
+            Encoding.UTF8.GetString(nicknameBytes),
             string.Empty, // Can't not get uid
             Encoding.UTF8.GetString(bytes[102]),
             Encoding.UTF8.GetString(bytes[103]),
@@ -108,7 +114,10 @@ internal class FetchStrangerService : BaseService<FetchStrangerEventReqBase, Fet
             DateTimeOffset.FromUnixTimeSeconds((long)numbers[20026]).DateTime,
             month != 0 && day != 0 ? new DateTime(year != 0 ? year : 1, month, day) : null,
             numbers[20037],
-            Encoding.UTF8.GetString(bytes[27394])
+            Encoding.UTF8.GetString(bytes[27394]),
+            Encoding.UTF8.GetString(bytes[20003]),
+            Encoding.UTF8.GetString(bytes[20004]),
+            bytes.TryGetValue(200021, out byte[]? value) ? Encoding.UTF8.GetString(value) : null
         )));
     }
 }

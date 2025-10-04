@@ -16,7 +16,7 @@ namespace Lagrange.Milky.Utility;
 public static partial class JsonUtility
 {
     [JsonSourceGenerationOptions(AllowOutOfOrderMetadataProperties = true)]
-    
+
     // BotContext
     [JsonSerializable(typeof(BotKeystore))]
     [JsonSerializable(typeof(BotAppInfo))]
@@ -39,6 +39,9 @@ public static partial class JsonUtility
     [JsonSerializable(typeof(GetLoginInfoResult))]
     // get_impl_info
     [JsonSerializable(typeof(GetImplInfoResult))]
+    // get_user_profile
+    [JsonSerializable(typeof(GetUserProfileParameter))]
+    [JsonSerializable(typeof(GetUserProfileResult))]
     // get_friend_list
     [JsonSerializable(typeof(GetFriendListParameter))]
     [JsonSerializable(typeof(GetFriendListResult))]
@@ -57,6 +60,9 @@ public static partial class JsonUtility
     // get_group_member_info
     [JsonSerializable(typeof(GetGroupMemberInfoParameter))]
     [JsonSerializable(typeof(GetGroupMemberInfoResult))]
+    // get_cookies
+    [JsonSerializable(typeof(GetCookiesParameter))]
+    [JsonSerializable(typeof(GetCookiesResult))]
     // == message ==
     // send_private_message
     [JsonSerializable(typeof(SendPrivateMessageParameter))]
@@ -86,6 +92,11 @@ public static partial class JsonUtility
     [JsonSerializable(typeof(QuitGroupParameter))]
     // accept_group_invitation
     [JsonSerializable(typeof(AcceptGroupInvitationRequestParameter))]
+    // send_group_message_reaction
+    [JsonSerializable(typeof(SendGroupMessageReactionParameter))]
+    // get_group_notifications
+    [JsonSerializable(typeof(GetGroupNotificationsParameter))]
+    [JsonSerializable(typeof(GetGroupNotificationsResult))]
     // == file ==
     // upload_group_file
     [JsonSerializable(typeof(UploadGroupFileParameter))]

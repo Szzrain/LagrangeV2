@@ -1,7 +1,6 @@
 using System.Buffers;
 using Lagrange.Proto.Primitives;
 using Lagrange.Proto.Serialization;
-using Lagrange.Proto.Serialization.Converter;
 using Lagrange.Proto.Serialization.Metadata;
 using Lagrange.Proto.Utility;
 
@@ -15,7 +14,7 @@ public partial class ProtoObject() : ProtoNode(WireType.LengthDelimited)
         
         foreach (var (f, node) in _fields)
         {
-            writer.EncodeVarInt(f << 3 | (int)node.WireType);
+            writer.EncodeVarInt((uint)f << 3 | (uint)node.WireType);
             node.WriteTo(f, writer);
         }
     }
@@ -25,7 +24,9 @@ public partial class ProtoObject() : ProtoNode(WireType.LengthDelimited)
         int size = 0;
         foreach (var (f, node) in _fields)
         {
-            size += ProtoHelper.GetVarIntLength(f << 3 | (int)node.WireType);
+            if (node is ProtoArray { Count: 0 }) continue;
+            
+            size += ProtoHelper.GetVarIntLength((uint)f << 3 | (uint)node.WireType);
             size += node.Measure(f);
         }
         return size;
@@ -68,8 +69,8 @@ public partial class ProtoObject() : ProtoNode(WireType.LengthDelimited)
 
         while (!reader.IsCompleted)
         {
-            int tag = reader.DecodeVarInt<int>();
-            int field = tag >> 3;
+            uint tag = reader.DecodeVarInt<uint>();
+            int field = (int)(tag >> 3);
             var wireType = (WireType)(tag & 0x7);
 
             var rawValue = converter.Read(field, wireType, ref reader);
@@ -86,7 +87,9 @@ public partial class ProtoObject() : ProtoNode(WireType.LengthDelimited)
         {
             foreach (var (f, node) in _fields)
             {
-                writer.EncodeVarInt(f << 3 | (int)node.WireType);
+                if (node is ProtoArray { Count: 0 }) continue;
+                
+                writer.EncodeVarInt((uint)f << 3 | (uint)node.WireType);
                 node.WriteTo(f, writer);
             }
             writer.Flush();
@@ -106,7 +109,7 @@ public partial class ProtoObject() : ProtoNode(WireType.LengthDelimited)
         {
             foreach (var (f, node) in _fields)
             {
-                writer.EncodeVarInt(f << 3 | (int)node.WireType);
+                writer.EncodeVarInt((uint)f << 3 | (uint)node.WireType);
                 node.WriteTo(f, writer);
             } 
             writer.Flush();

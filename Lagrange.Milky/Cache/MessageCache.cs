@@ -42,20 +42,19 @@ public class MessageCache(BotContext bot, IOptions<MilkyConfiguration> options) 
             MessageType.Temp => throw new NotSupportedException(),
             _ => throw new NotSupportedException(),
         };
-        int sequence = message.Type == MessageType.Private ? message.ClientSequence : message.Sequence;
+        ulong sequence = message.Type == MessageType.Private ? message.ClientSequence : message.Sequence;
 
         _cache.Put(new MessageKey(type, peer, sequence), message);
     }
 
     public Task StopAsync(CancellationToken cancellationToken)
     {
-        // TODO
-        // _bot.EventInvoker.UnregisterEvent<BotMessageEvent>(HandleBotMessageEvent);
+        _bot.EventInvoker.UnregisterEvent<BotMessageEvent>(HandleBotMessageEvent);
 
         return Task.CompletedTask;
     }
 
-    public async Task<BotMessage?> GetMessageAsync(MessageType type, long peer, int sequence, CancellationToken token)
+    public async Task<BotMessage?> GetMessageAsync(MessageType type, long peer, ulong sequence, CancellationToken token)
     {
         var key = new MessageKey(type, peer, sequence);
 
@@ -79,13 +78,13 @@ public class MessageCache(BotContext bot, IOptions<MilkyConfiguration> options) 
         return message;
     }
 
-    public class MessageKey(MessageType type, long peer, int sequence)
+    public class MessageKey(MessageType type, long peer, ulong sequence)
     {
         public MessageType Type { get; } = type;
 
         public long Peer { get; } = peer;
 
-        public int Sequence { get; } = sequence;
+        public ulong Sequence { get; } = sequence;
 
         public override bool Equals(object? obj)
         {

@@ -9,6 +9,8 @@ internal partial class Elem
     [ProtoMember(1)] public Text? Text { get; set; } 
     
     [ProtoMember(4)] public NotOnlineImage? NotOnlineImage { get; set; }
+
+    [ProtoMember(5)] public TransElem? TransElemInfo { get; set; }
     
     [ProtoMember(8)] public CustomFace? CustomFace { get; set; }
     
@@ -99,6 +101,14 @@ internal partial class NotOnlineImage
     [ProtoMember(28)] public uint Height400 { get; set; }
 
     [ProtoMember(29)] public byte[] PbReserve { get; set; }
+}
+
+[ProtoPackable]
+internal partial class TransElem
+{
+    [ProtoMember(1)] public uint ElemType { get; set; }
+
+    [ProtoMember(2)] public byte[] ElemValue { get; set; }
 }
 
 [ProtoPackable]
@@ -278,7 +288,7 @@ internal partial class VideoFile
 [ProtoPackable]
 internal partial class SourceMsg
 {
-    [ProtoMember(1)] public uint[] OrigSeqs { get; set; } // 原消息seq
+    [ProtoMember(1)] public ulong[] OrigSeqs { get; set; } // 原消息seq
 
     [ProtoMember(2)] public ulong SenderUin { get; set; } // 所属发送者uin
 

@@ -49,7 +49,7 @@ public partial class EntityConvert
         MentionEntity mention when mention.Uin != 0 => new MentionIncomingSegment(mention.Uin),
         MentionEntity mention when mention.Uin == 0 => new MentionAllIncomingSegment(),
         // ? => new FaceSegment(...),
-        ReplyEntity reply => new ReplyIncomingSegment(reply.SrcSequence),
+        ReplyEntity reply => new ReplyIncomingSegment((long)reply.SrcSequence),
         ImageEntity image => new ImageIncomingSegment(
             image.FileUuid,
             image.FileUrl,
@@ -70,6 +70,7 @@ public partial class EntityConvert
             (int)video.VideoSize.Y,
             (int)video.VideoLength
         ),
+        GroupFileEntity groupFile => new FileIncomingSegment(groupFile.FileId, groupFile.FileName, groupFile.FileSize),
         MultiMsgEntity multiMsg => new ForwardIncomingSegment(multiMsg.ResId!),
         LightAppEntity lightApp => new LightAppIncomingSegment(lightApp.AppName, lightApp.Payload),
         // ? => new MarketFaceSegment(...),
@@ -97,7 +98,7 @@ public partial class EntityConvert
         TextOutgoingSegment text => new TextEntity(text.Data.Text),
         MentionOutgoingSegment mention => new MentionEntity(mention.Data.UserId, null),
         MentionAllOutgoingSegment => new MentionEntity(0, "@全体成员"),
-        // TODO
+        // TODO: no FaceEntity
         FaceOutgoingSegment => throw new NotImplementedException(),
         // ReplySegment => 
         ImageOutgoingSegment image => new ImageEntity(
@@ -126,16 +127,16 @@ public partial class EntityConvert
 
     private async Task<IMessageEntity> ReplyGroupSegmentAsync(ReplyOutgoingSegment reply, long uin, CancellationToken token)
     {
-        int sequence = (int)reply.Data.MessageSeq;
-        var message = await _cache.GetMessageAsync(MessageType.Group, uin, sequence, token);
+        long sequence = reply.Data.MessageSeq;
+        var message = await _cache.GetMessageAsync(MessageType.Group, uin, (ulong)sequence, token);
         if (message == null) throw new Exception("message not found");
 
         return new ReplyEntity(message);
     }
     private async Task<IMessageEntity> ReplyFriendSegmentAsync(ReplyOutgoingSegment reply, long uin, CancellationToken token)
     {
-        int sequence = (int)reply.Data.MessageSeq;
-        var message = await _cache.GetMessageAsync(MessageType.Private, uin, sequence, token);
+        long sequence = reply.Data.MessageSeq;
+        var message = await _cache.GetMessageAsync(MessageType.Private, uin, (ulong)sequence, token);
         if (message == null) throw new Exception("message not found");
 
         return new ReplyEntity(message);

@@ -8,7 +8,7 @@ internal class ProtoNumberConverter<T> : ProtoConverter<T> where T : unmanaged, 
 {
     public override bool ShouldSerialize(T value, bool ignoreDefaultValue)
     {
-        return !ignoreDefaultValue && value != default;
+        return !ignoreDefaultValue || value != default;
     }
     
     public override void Write(int field, WireType wireType, ProtoWriter writer, T value)
@@ -29,11 +29,36 @@ internal class ProtoNumberConverter<T> : ProtoConverter<T> where T : unmanaged, 
         }
     }
 
-    public override void WriteWithNumberHandling(int field, WireType wireType, ProtoWriter writer, T value, ProtoNumberHandling numberHandling)
+    public override unsafe void WriteWithNumberHandling(int field, WireType wireType, ProtoWriter writer, T value, ProtoNumberHandling numberHandling)
     {
         if ((numberHandling & ProtoNumberHandling.Signed) != 0)
         {
-            Write(field, wireType, writer, ProtoHelper.ZigZagEncode(value));
+            var encoded = ProtoHelper.ZigZagEncode(value);
+            if (wireType == WireType.VarInt)
+            {
+                switch (sizeof(T))
+                {
+                    case 1:
+                        writer.EncodeVarInt(byte.CreateSaturating(encoded));
+                        break;
+                    case 2:
+                        writer.EncodeVarInt(ushort.CreateSaturating(encoded));
+                        break;
+                    case 4:
+                        writer.EncodeVarInt(uint.CreateSaturating(encoded));
+                        break;
+                    case 8:
+                        writer.EncodeVarInt(ulong.CreateSaturating(encoded));
+                        break;
+                    default:
+                        Write(field, wireType, writer, encoded);
+                        break;
+                }
+            }
+            else
+            {
+                Write(field, wireType, writer, encoded);
+            }
         }
         else
         {
@@ -51,6 +76,23 @@ internal class ProtoNumberConverter<T> : ProtoConverter<T> where T : unmanaged, 
             _ => throw new ArgumentOutOfRangeException(nameof(wireType), wireType, null)
         };
     }
+    
+    public override unsafe int MeasureWithNumberHandling(int field, WireType wireType, T value, ProtoNumberHandling numberHandling)
+    {
+        if ((numberHandling & ProtoNumberHandling.Signed) != 0 && wireType == WireType.VarInt)
+        {
+            T encoded = ProtoHelper.ZigZagEncode(value);
+            return sizeof(T) switch
+            {
+                1 => ProtoHelper.GetVarIntLength(byte.CreateSaturating(encoded)),
+                2 => ProtoHelper.GetVarIntLength(ushort.CreateSaturating(encoded)),
+                4 => ProtoHelper.GetVarIntLength(uint.CreateSaturating(encoded)),
+                8 => ProtoHelper.GetVarIntLength(ulong.CreateSaturating(encoded)),
+                _ => ProtoHelper.GetVarIntLength(encoded)
+            };
+        }
+        return Measure(field, wireType, value);
+    }
 
     public override T Read(int field, WireType wireType, ref ProtoReader reader)
     {
@@ -63,9 +105,24 @@ internal class ProtoNumberConverter<T> : ProtoConverter<T> where T : unmanaged, 
         };
     }
     
-    public override T ReadWithNumberHandling(int field, WireType wireType, ref ProtoReader reader, ProtoNumberHandling numberHandling)
+    public override unsafe T ReadWithNumberHandling(int field, WireType wireType, ref ProtoReader reader, ProtoNumberHandling numberHandling)
     {
-        T value = Read(field, wireType, ref reader);
-        return (numberHandling & ProtoNumberHandling.Signed) != 0 ? ProtoHelper.ZigZagDecode(value) : value;
+        if ((numberHandling & ProtoNumberHandling.Signed) != 0 && wireType == WireType.VarInt)
+        {
+            T value = sizeof(T) switch
+            {
+                1 => T.CreateTruncating(reader.DecodeVarInt<byte>()),
+                2 => T.CreateTruncating(reader.DecodeVarInt<ushort>()),
+                4 => T.CreateTruncating(reader.DecodeVarInt<uint>()),
+                8 => T.CreateTruncating(reader.DecodeVarInt<ulong>()),
+                _ => Read(field, wireType, ref reader)
+            };
+            return ProtoHelper.ZigZagDecode(value);
+        }
+        else
+        {
+            T value = Read(field, wireType, ref reader);
+            return (numberHandling & ProtoNumberHandling.Signed) != 0 ? ProtoHelper.ZigZagDecode(value) : value;
+        }
     }
 }
