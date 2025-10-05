@@ -89,6 +89,8 @@ public static partial class JsonUtility
     [JsonSerializable(typeof(SetGroupMemberSpecialTitleParameter))]
     // quit_group
     [JsonSerializable(typeof(QuitGroupParameter))]
+    // accept_group_invitation
+    [JsonSerializable(typeof(AcceptGroupInvitationRequestParameter))]
     // send_group_message_reaction
     [JsonSerializable(typeof(SendGroupMessageReactionParameter))]
     // get_group_notifications
